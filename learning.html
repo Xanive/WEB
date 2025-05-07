@@ -599,94 +599,6 @@
 
   <script src="auth.js"></script>
   <script>
-    function updateHeaderForUser() {
-      const authArea = document.getElementById("authArea");
-      if (user) {
-        authArea.innerHTML = `
-          <div class="profile-dropdown">
-            <button class="btn" onclick="toggleDropdown(event)">
-              <img src="${user.profilePicture||'https://via.placeholder.com/32'}" class="profile-picture" />
-              ${user.displayName}
-            </button>
-            <div class="dropdown-content" id="profileDropdown">
-              <label for="editName">Display Name:</label>
-              <input type="text" id="editName" value="${user.displayName}" />
-              <div class="profile-pic-upload">
-                <label>
-                  <svg viewBox="0 0 24 24">
-                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/>
-                  </svg>
-                  Change Profile Picture
-                  <input type="file" id="profilePicFile" accept="image/*" onchange="handleProfilePicChange(event)" />
-                </label>
-              </div>
-              <button class="btn" onclick="saveProfile()">Save Changes</button>
-              <hr />
-              <button class="btn logout" onclick="logoutUser()">Logout</button>
-            </div>
-          </div>`;
-      } else {
-        authArea.innerHTML = `
-          <button class="btn" onclick="openModal('loginModal')">Login</button>
-          <button class="btn" onclick="openModal('registerModal')">Register</button>
-        `;
-      }
-    }
-
-    function loginUser() {
-      const u = document.getElementById('loginUsername').value.trim();
-      const p = document.getElementById('loginPassword').value.trim();
-      const f = registeredUsers.find(x => x.username === u && x.password === p);
-      if (f) { user = f; localStorage.setItem('user', JSON.stringify(user)); closeModal('loginModal'); updateHeaderForUser(); alert('Login successful!'); }
-      else alert('Invalid credentials.');
-    }
-
-    function registerUser() {
-      const u = document.getElementById('registerUsername').value.trim();
-      const p = document.getElementById('registerPassword').value.trim();
-      const dn = document.getElementById('registerDisplayName').value.trim();
-      if (!u || !p || !dn) { alert('Please fill all fields.'); return; }
-      if (registeredUsers.some(x => x.username === u)) { alert('Username taken.'); return; }
-      const nu = { username: u, password: p, displayName: dn, profilePicture: null };
-      registeredUsers.push(nu);
-      localStorage.setItem('registeredUsers', JSON.stringify(registeredUsers));
-      alert('Registration successful!'); closeModal('registerModal');
-    }
-
-    function logoutUser() { user = null; localStorage.removeItem('user'); updateHeaderForUser(); }
-
-    function openModal(id) {
-      document.getElementById(id).style.display = 'block';
-      document.getElementById('pageContent').classList.add('blur');
-      document.body.style.overflow = 'hidden';
-    }
-
-    function closeModal(id) {
-      document.getElementById(id).style.display = 'none';
-      document.getElementById('pageContent').classList.remove('blur');
-      document.body.style.overflow = 'auto';
-    }
-
-    window.onclick = e => document.querySelectorAll('.modal').forEach(m => { if (e.target === m) closeModal(m.id); });
-
-    function toggleDropdown(event) {
-      event.stopPropagation();
-      const dropdown = document.getElementById('profileDropdown');
-      dropdown.classList.toggle('active');
-      
-      // Add click event listener to document
-      document.addEventListener('click', function closeDropdown(e) {
-        if (!dropdown.contains(e.target) && !e.target.closest('.btn')) {
-          dropdown.classList.remove('active');
-          document.removeEventListener('click', closeDropdown);
-        }
-      });
-    }
-
-    function handleProfilePicChange(e) { const f = e.target.files[0]; if (f) { const r = new FileReader(); r.onload = ev => { user.profilePicture = ev.target.result; localStorage.setItem('user', JSON.stringify(user)); document.querySelector('.profile-picture').src = user.profilePicture; }; r.readAsDataURL(f); }}
-
-    function saveProfile() { const n = document.getElementById('editName').value.trim(); if (n) { user.displayName = n; localStorage.setItem('user', JSON.stringify(user)); updateHeaderForUser(); }}
-
     // Quiz functionality
     const quizQuestions = [
       { question: 'What is the output of print(2 ** 3)?', options: ['4','8','6'], correctAnswer: '8' },
@@ -802,7 +714,6 @@
 
     document.addEventListener('DOMContentLoaded', () => {
       console.log('DOM Content Loaded');
-      updateHeaderForUser();
       loadTasks();
       console.log('Tasks loaded');
       loadQuiz();
