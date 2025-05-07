@@ -2,24 +2,43 @@
 let user = localStorage.getItem("user") ? JSON.parse(localStorage.getItem("user")) : null;
 let registeredUsers = localStorage.getItem("registeredUsers") ? JSON.parse(localStorage.getItem("registeredUsers")) : [];
 
+// Get the base path for GitHub Pages
+const getBasePath = () => {
+    const path = window.location.pathname;
+    // Check if we're on GitHub Pages
+    if (path.includes('/hiPython/')) {
+        return '/hiPython/';
+    }
+    return '/';
+};
+
 // Update header based on user state
 function updateHeaderForUser() {
     const authArea = document.getElementById("authArea");
+    if (!authArea) return; // Guard against missing element
+    
     if (user) {
         authArea.innerHTML = `
             <div class="profile-dropdown">
-                <button class="btn" onclick="toggleDropdown()">
+                <button class="btn" onclick="toggleDropdown(event)">
                     <img src="${user.profilePicture||'https://via.placeholder.com/32'}" class="profile-picture" />
                     ${user.displayName}
                 </button>
                 <div class="dropdown-content" id="profileDropdown">
                     <label for="editName">Display Name:</label>
                     <input type="text" id="editName" value="${user.displayName}" />
-                    <label for="profilePicFile">Profile Picture:</label>
-                    <input type="file" id="profilePicFile" accept="image/*" onchange="handleProfilePicChange(event)" />
-                    <button class="btn" onclick="saveProfile()">Save</button>
-                    <hr style="margin:8px 0;" />
-                    <button class="btn" onclick="logoutUser()">Logout</button>
+                    <div class="profile-pic-upload">
+                        <label>
+                            <svg viewBox="0 0 24 24">
+                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/>
+                            </svg>
+                            Change Profile Picture
+                            <input type="file" id="profilePicFile" accept="image/*" onchange="handleProfilePicChange(event)" />
+                        </label>
+                    </div>
+                    <button class="btn" onclick="saveProfile()">Save Changes</button>
+                    <hr />
+                    <button class="btn logout" onclick="logoutUser()">Logout</button>
                 </div>
             </div>`;
     } else {
@@ -35,6 +54,11 @@ function loginUser() {
     const username = document.getElementById('loginUsername').value;
     const password = document.getElementById('loginPassword').value;
     
+    if (!username || !password) {
+        alert('Please fill in all fields');
+        return;
+    }
+    
     const foundUser = registeredUsers.find(u => u.username === username && u.password === password);
     
     if (foundUser) {
@@ -43,6 +67,9 @@ function loginUser() {
         updateHeaderForUser();
         closeModal('loginModal');
         document.getElementById('loginForm').reset();
+        
+        // Redirect to home page after successful login
+        window.location.href = getBasePath();
     } else {
         alert('Invalid username or password');
     }
@@ -53,6 +80,11 @@ function registerUser() {
     const username = document.getElementById('registerUsername').value;
     const password = document.getElementById('registerPassword').value;
     const displayName = document.getElementById('registerDisplayName').value;
+    
+    if (!username || !password || !displayName) {
+        alert('Please fill in all fields');
+        return;
+    }
     
     if (registeredUsers.some(u => u.username === username)) {
         alert('Username already exists');
@@ -75,12 +107,26 @@ function registerUser() {
     updateHeaderForUser();
     closeModal('registerModal');
     document.getElementById('registerForm').reset();
+    
+    // Redirect to home page after successful registration
+    window.location.href = getBasePath();
 }
 
 // Profile management
-function toggleDropdown() {
+function toggleDropdown(event) {
+    event.stopPropagation();
     const dropdown = document.getElementById('profileDropdown');
-    dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+    if (!dropdown) return;
+    
+    dropdown.classList.toggle('active');
+    
+    // Add click event listener to document
+    document.addEventListener('click', function closeDropdown(e) {
+        if (!dropdown.contains(e.target) && !e.target.closest('.btn')) {
+            dropdown.classList.remove('active');
+            document.removeEventListener('click', closeDropdown);
+        }
+    });
 }
 
 function handleProfilePicChange(e) {
@@ -109,15 +155,21 @@ function logoutUser() {
     user = null;
     localStorage.removeItem('user');
     updateHeaderForUser();
+    // Redirect to home page after logout
+    window.location.href = getBasePath();
 }
 
 // Modal management
 function openModal(modalId) {
-    document.getElementById(modalId).style.display = 'block';
+    const modal = document.getElementById(modalId);
+    if (!modal) return;
+    modal.style.display = 'block';
 }
 
 function closeModal(modalId) {
-    document.getElementById(modalId).style.display = 'none';
+    const modal = document.getElementById(modalId);
+    if (!modal) return;
+    modal.style.display = 'none';
 }
 
 // Close modals when clicking outside
@@ -130,6 +182,24 @@ window.onclick = function(event) {
 // Initialize auth when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
     updateHeaderForUser();
+    
+    // Add event listeners for forms
+    const loginForm = document.getElementById('loginForm');
+    const registerForm = document.getElementById('registerForm');
+    
+    if (loginForm) {
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            loginUser();
+        });
+    }
+    
+    if (registerForm) {
+        registerForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            registerUser();
+        });
+    }
 });
 
 // Interactive Background
