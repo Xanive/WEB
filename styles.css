@@ -573,27 +573,154 @@ header {
   header {
     flex-direction: column;
     gap: var(--spacing-md);
+    padding: var(--spacing-sm);
+  }
+
+  .logo {
+    font-size: 2rem;
   }
 
   #searchInput {
+    width: 100%;
+    max-width: 100%;
+    padding: 12px 20px 12px 45px;
+  }
+
+  #searchInput:focus {
+    width: 100%;
+  }
+
+  .search-results {
     width: 90%;
+    max-height: 300px;
   }
 
   .learning-content,
   .quiz {
-    margin: var(--spacing-lg) var(--spacing-md);
+    margin: var(--spacing-md);
     padding: var(--spacing-md);
   }
 
   .btn {
     padding: 10px 20px;
     font-size: 0.9rem;
+    width: 100%;
+    margin: var(--spacing-xs) 0;
   }
 
   h1 { font-size: 2rem; }
   h2 { font-size: 1.8rem; }
   h3 { font-size: 1.2rem; }
   p { font-size: 1rem; }
+
+  .topics-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+    padding: 20px;
+  }
+
+  .topic-card {
+    padding: 20px;
+  }
+
+  .featured-topic {
+    padding: 20px;
+  }
+
+  .category-nav {
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 10px;
+  }
+
+  .category-nav a {
+    padding: 8px 16px;
+    font-size: 0.9rem;
+  }
+
+  .modal-content {
+    width: 95%;
+    margin: 10% auto;
+    padding: 20px;
+  }
+
+  .dropdown-content {
+    width: 100%;
+    min-width: unset;
+  }
+}
+
+@media (max-width: 480px) {
+  :root {
+    --spacing-md: 16px;
+    --spacing-lg: 24px;
+  }
+
+  header {
+    padding: var(--spacing-xs);
+  }
+
+  .logo {
+    font-size: 1.8rem;
+  }
+
+  .learning-content,
+  .quiz {
+    margin: var(--spacing-sm);
+    padding: var(--spacing-sm);
+  }
+
+  .task textarea {
+    height: 120px;
+  }
+
+  .progress {
+    font-size: 1.1rem;
+  }
+
+  .progress-bar {
+    height: 12px;
+  }
+
+  .modal-content {
+    margin: 5% auto;
+  }
+
+  .form-group input {
+    padding: 10px;
+  }
+}
+
+/* Touch Device Optimizations */
+@media (hover: none) {
+  .topic-card:hover {
+    transform: none;
+  }
+
+  .btn:hover {
+    transform: none;
+  }
+
+  .python-logo:hover {
+    transform: none;
+  }
+}
+
+/* Landscape Mode Optimizations */
+@media (max-height: 500px) and (orientation: landscape) {
+  header {
+    position: relative;
+  }
+
+  .modal-content {
+    margin: 5% auto;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+
+  .learning-content {
+    margin: var(--spacing-sm) auto;
+  }
 }
 
 /* Quiz buttons */
