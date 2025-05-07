@@ -1,0 +1,1462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Python Topics - h!Python</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    /* Global Animated Gradient Background */
+    @keyframes bgAnimation {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    body {
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(-45deg, #201f31, #2a283f, #34304c, #2a283f);
+      background-size: 400% 400%;
+      animation: bgAnimation 20s ease infinite;
+      color: #ffffff;
+      text-align: center;
+      overflow-x: hidden;
+    }
+    .blur { filter: blur(5px); }
+
+    /* Header & Footer with Glassmorphism */
+    header, footer {
+      backdrop-filter: blur(10px);
+      background: rgba(30, 30, 30, 0.6);
+      padding: 20px 40px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      border-top: 1px solid rgba(255,255,255,0.1);
+      width: 100%;
+    }
+    header { 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center; 
+      position: sticky; 
+      top: 0; 
+      z-index: 100;
+      gap: 20px;
+    }
+    .logo { 
+      font-size: 2.4rem; 
+      font-weight: 700;
+      letter-spacing: 3px; 
+      text-shadow: 2px 2px 8px rgba(0,0,0,0.7);
+      white-space: nowrap;
+    }
+    .logo .exclamation { color: #ffbade; text-shadow: none; }
+
+    /* Search bar with Icon */
+    #searchInput {
+      position: relative;
+      padding: 14px 20px 14px 50px;
+      border-radius: 30px;
+      border: none;
+      background-color: rgba(255, 255, 255, 0.15);
+      color: #fff;
+      width: 600px;
+      outline: none;
+      transition: background 0.3s ease, width 0.4s ease;
+      background-image: url('data:image/svg+xml;utf8,<svg fill="%23fff" height="16" viewBox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg"><path d="M9.5 3a6.5 6.5 0 014.7 11 6.5 6.5 0 11-9.2-9.2A6.47 6.47 0 019.5 3m0-2C4.262 1 0 5.262 0 10.5S4.262 20 9.5 20a9.5 9.5 0 109.5-9.5c0-5.238-4.262-9.5-9.5-9.5z"/></svg>');
+      background-repeat: no-repeat;
+      background-position: 16px center;
+    }
+    #searchInput:focus {
+      background-color: rgba(255, 255, 255, 0.2);
+      width: 650px;
+    }
+    #searchInput::placeholder {
+      color: rgba(255, 255, 255, 0.7);
+    }
+    #searchInput:focus::placeholder {
+      color: rgba(255, 255, 255, 0.5);
+    }
+
+    /* Search Results Dropdown */
+    .search-results {
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 600px;
+      max-height: 400px;
+      overflow-y: auto;
+      background: rgba(30, 30, 30, 0.95);
+      border-radius: 16px;
+      margin-top: 10px;
+      padding: 10px;
+      display: none;
+      z-index: 1000;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+    }
+
+    .search-results.active {
+      display: block;
+      animation: slideDown 0.3s ease;
+    }
+
+    .search-result-item {
+      padding: 12px 16px;
+      margin: 4px 0;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+      text-align: left;
+      color: #fff;
+    }
+
+    .search-result-item:hover {
+      background: rgba(255, 186, 222, 0.2);
+    }
+
+    @keyframes slideDown {
+      from { opacity: 0; transform: translate(-50%, -10px); }
+      to { opacity: 1; transform: translate(-50%, 0); }
+    }
+
+    /* Buttons with Neon Glow */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 15px 20px;
+      background: rgba(255, 186, 222, 0.2);
+      border: none;
+      border-radius: 12px;
+      color: #fff;
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 1.1rem;
+      transition: all 0.3s ease;
+    }
+    .btn:hover {
+      background: rgba(255, 186, 222, 0.3);
+      transform: translateY(-2px);
+    }
+
+    /* Auth area */
+    #authArea { position: relative; }
+    .profile-picture { 
+      width: 32px; 
+      height: 32px; 
+      border-radius: 50%; 
+      border: 2px solid #fff;
+      transition: transform 0.3s ease;
+    }
+    .profile-dropdown { 
+      position: relative; 
+      display: inline-block; 
+    }
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      right: 0;
+      background: rgba(42, 40, 63, 0.95);
+      min-width: 280px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.7);
+      padding: 25px;
+      border-radius: 16px;
+      z-index: 100;
+      backdrop-filter: blur(15px);
+      opacity: 0;
+      transform: translateY(-10px);
+      transition: opacity 0.3s ease, transform 0.3s ease;
+      border: 1px solid rgba(255, 186, 222, 0.2);
+    }
+
+    .dropdown-content.active {
+      display: block;
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .dropdown-content label {
+      display: block;
+      color: #bbb;
+      margin-bottom: 8px;
+      font-size: 0.9rem;
+    }
+
+    .dropdown-content input[type="text"] {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 15px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 186, 222, 0.2);
+      border-radius: 8px;
+      color: #fff;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+    }
+
+    .dropdown-content input[type="text"]:focus {
+      outline: none;
+      border-color: rgba(255, 186, 222, 0.5);
+      background: rgba(255, 255, 255, 0.15);
+    }
+
+    .profile-pic-upload {
+      position: relative;
+      margin-bottom: 20px;
+    }
+
+    .profile-pic-upload label {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px;
+      background: rgba(255, 186, 222, 0.2);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .profile-pic-upload label:hover {
+      background: rgba(255, 186, 222, 0.3);
+      transform: translateY(-2px);
+    }
+
+    .profile-pic-upload input[type="file"] {
+      display: none;
+    }
+
+    .profile-pic-upload svg {
+      width: 20px;
+      height: 20px;
+      fill: #fff;
+    }
+
+    .dropdown-content hr {
+      border: none;
+      border-top: 1px solid rgba(255, 186, 222, 0.2);
+      margin: 15px 0;
+    }
+
+    .dropdown-content button {
+      width: 100%;
+      margin-top: 10px;
+    }
+
+    .dropdown-content button.logout {
+      background: rgba(255, 186, 222, 0.15);
+    }
+
+    .dropdown-content button.logout:hover {
+      background: rgba(255, 186, 222, 0.25);
+    }
+
+    /* Content Container with Fade Effect */
+    .content-container {
+      max-width: 1660px;
+      margin: 0 auto;
+      padding: 0 20px;
+      position: relative;
+    }
+
+    .content-container::before,
+    .content-container::after {
+      content: '';
+      position: fixed;
+      top: 0;
+      width: 130px;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .content-container::before {
+      left: 0;
+      background: linear-gradient(to right, 
+        rgba(32, 31, 49, 1) 0%,
+        rgba(32, 31, 49, 0) 100%
+      );
+    }
+
+    .content-container::after {
+      right: 0;
+      background: linear-gradient(to left, 
+        rgba(32, 31, 49, 1) 0%,
+        rgba(32, 31, 49, 0) 100%
+      );
+    }
+
+    /* Update Topics Grid Layout */
+    .topics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 30px;
+      padding: 40px 0;
+      max-width: 1660px;
+      margin: 0 auto;
+    }
+
+    .topic-card {
+      background: rgba(30,30,30,0.75);
+      border-radius: 24px;
+      padding: 30px;
+      text-align: left;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+      cursor: pointer;
+    }
+
+    .topic-card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 15px 50px rgba(0,0,0,0.8);
+    }
+
+    .topic-card h2 {
+      color: #ffbade;
+      margin-bottom: 15px;
+      font-size: 1.8rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .topic-card h2::after {
+      content: '+';
+      font-size: 1.5rem;
+      transition: transform 0.3s ease;
+    }
+
+    .topic-card.active h2::after {
+      transform: rotate(45deg);
+    }
+
+    .topic-card .preview {
+      color: #bbb;
+      margin-bottom: 20px;
+      line-height: 1.6;
+    }
+
+    .topic-card .read-more {
+      display: inline-block;
+      color: #ffbade;
+      text-decoration: none;
+      font-weight: 600;
+      transition: color 0.3s ease;
+    }
+
+    .topic-card .read-more:hover {
+      color: #ffc6e4;
+    }
+
+    /* Update Featured Topic */
+    .featured-topic {
+      grid-column: 1 / -1;
+      background: linear-gradient(45deg, rgba(30,30,30,0.9), rgba(42,40,63,0.9));
+      padding: 40px;
+      border-radius: 24px;
+      margin-bottom: 20px;
+      text-align: left;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 15px 50px rgba(0,0,0,0.7);
+    }
+
+    .featured-topic h1 {
+      color: #ffbade;
+      font-size: 2.5rem;
+      margin-bottom: 20px;
+    }
+
+    .featured-topic p {
+      color: #bbb;
+      font-size: 1.2rem;
+      line-height: 1.8;
+      margin-bottom: 30px;
+    }
+
+    /* Update Category Navigation */
+    .category-nav {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      padding: 20px;
+      background: rgba(30,30,30,0.6);
+      backdrop-filter: blur(10px);
+      position: sticky;
+      top: 80px;
+      z-index: 90;
+      max-width: 1660px;
+      margin: 0 auto;
+    }
+
+    .category-nav a {
+      color: #fff;
+      text-decoration: none;
+      padding: 10px 20px;
+      border-radius: 20px;
+      transition: background 0.3s ease;
+    }
+
+    .category-nav a:hover {
+      background: rgba(255,186,222,0.2);
+    }
+
+    .category-nav a.active {
+      background: #ffbade;
+      color: #000;
+    }
+
+    /* Responsive Design Updates */
+    @media (max-width: 1920px) {
+      .content-container::before,
+      .content-container::after {
+        width: 100px;
+      }
+    }
+
+    @media (max-width: 1660px) {
+      .content-container::before,
+      .content-container::after {
+        width: 50px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .content-container::before,
+      .content-container::after {
+        display: none;
+      }
+      
+      .topics-grid {
+        grid-template-columns: 1fr;
+        padding: 20px;
+      }
+
+      .category-nav {
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+
+      .category-nav a {
+        padding: 8px 16px;
+        font-size: 0.9rem;
+      }
+
+      .featured-topic h1 {
+        font-size: 2rem;
+      }
+    }
+
+    /* Code Module Styling */
+    .code-module {
+      background: rgba(0, 0, 0, 0.6);
+      border-radius: 16px;
+      padding: 20px;
+      margin: 20px 0;
+      text-align: left;
+      font-family: 'Courier New', monospace;
+      position: relative;
+    }
+
+    .code-module pre {
+      margin: 0;
+      color: #fff;
+      white-space: pre-wrap;
+    }
+
+    .code-module .copy-button {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: rgba(255, 186, 222, 0.2);
+      border: none;
+      color: #fff;
+      padding: 8px 15px;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 0.9rem;
+    }
+
+    .code-module .copy-button:hover {
+      background: rgba(255, 186, 222, 0.3);
+      transform: translateY(-2px);
+    }
+
+    /* Topic Card Content */
+    .topic-content {
+      display: none;
+      text-align: left;
+      line-height: 1.6;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+
+    .topic-content.active {
+      display: block;
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .topic-content h3 {
+      color: #ffbade;
+      margin: 20px 0 10px;
+    }
+
+    .topic-content ul {
+      list-style-type: none;
+      padding-left: 20px;
+    }
+
+    .topic-content li {
+      margin: 10px 0;
+      color: #bbb;
+      padding-left: 0;
+    }
+
+    .topic-content li::before {
+      content: "";
+      display: none;
+    }
+
+    /* Topic Modal */
+    .topic-modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0,0,0,0.7);
+      backdrop-filter: blur(5px);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .topic-modal.active {
+      opacity: 1;
+    }
+
+    /* Topic Modal Content Styling */
+    .topic-modal-content {
+      background: rgba(30,30,30,0.95);
+      margin: 5% auto;
+      padding: 40px;
+      border: 1px solid rgba(255,255,255,0.1);
+      width: 90%;
+      max-width: 1200px;
+      max-height: 80vh;
+      border-radius: 24px;
+      color: white;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+      overflow-y: auto;
+      position: relative;
+      transform: translateY(20px);
+      opacity: 0;
+      transition: transform 0.3s ease, opacity 0.3s ease;
+    }
+
+    .topic-modal.active .topic-modal-content {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    .topic-modal-content h2 {
+      color: #ffbade;
+      margin-bottom: 30px;
+      font-size: 2.5rem;
+      text-align: center;
+      text-shadow: 0 2px 10px rgba(255,186,222,0.3);
+    }
+
+    .topic-modal-content h3 {
+      color: #ffbade;
+      margin: 40px 0 20px;
+      font-size: 1.8rem;
+      text-shadow: 0 2px 10px rgba(255,186,222,0.3);
+    }
+
+    .topic-modal-content p {
+      color: #bbb;
+      line-height: 1.8;
+      font-size: 1.1rem;
+      margin-bottom: 20px;
+    }
+
+    .topic-modal-content ul {
+      list-style: none;
+      padding-left: 0;
+      margin: 20px 0;
+    }
+
+    .topic-modal-content li {
+      color: #bbb;
+      margin: 15px 0;
+      line-height: 1.6;
+      font-size: 1.1rem;
+      position: relative;
+      padding-left: 0;
+    }
+
+    .topic-modal-content li::before {
+      content: "";
+      display: none;
+    }
+
+    .topic-modal-content .code-module {
+      background: rgba(0, 0, 0, 0.6);
+      border-radius: 16px;
+      padding: 25px;
+      margin: 25px 0;
+      position: relative;
+      border: 1px solid rgba(255,186,222,0.1);
+      box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+    }
+
+    .topic-modal-content .code-module pre {
+      color: #fff;
+      font-family: 'Courier New', monospace;
+      font-size: 1.1rem;
+      line-height: 1.6;
+      margin: 0;
+      white-space: pre-wrap;
+    }
+
+    .topic-modal-content .code-module .copy-button {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      background: rgba(255, 186, 222, 0.2);
+      border: none;
+      color: #fff;
+      padding: 8px 15px;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 0.9rem;
+    }
+
+    .topic-modal-content .code-module .copy-button:hover {
+      background: rgba(255, 186, 222, 0.3);
+      transform: translateY(-2px);
+    }
+
+    .topic-modal-content strong {
+      color: #fff;
+      font-weight: 600;
+    }
+
+    /* Scrollbar Styling */
+    ::-webkit-scrollbar {
+      width: 12px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.8);
+      border-radius: 6px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: rgba(255, 186, 222, 0.3);
+      border-radius: 6px;
+      border: 3px solid rgba(0, 0, 0, 0.95);
+      transition: transform 0.3s ease;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(255, 186, 222, 0.5);
+    }
+
+    /* Firefox Scrollbar */
+    * {
+      scrollbar-width: thin;
+      scrollbar-color: rgba(255, 186, 222, 0.3) rgba(0, 0, 0, 0.8);
+    }
+
+    /* Scroll Compression Effect */
+    .scroll-compressed::-webkit-scrollbar-thumb {
+      transform: scaleY(0.5);
+      transform-origin: center;
+    }
+
+    .topic-modal-content .close {
+      position: absolute;
+      right: 20px;
+      top: 20px;
+      color: #aaa;
+      font-size: 28px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .topic-modal-content .close:hover {
+      color: white;
+      background: rgba(255, 255, 255, 0.2);
+      transform: rotate(90deg);
+    }
+
+    /* Auth Area */
+    .auth-area {
+      display: flex;
+      gap: 15px;
+      align-items: center;
+    }
+    .auth-area button {
+      padding: 15px 20px;
+      background: rgba(255, 186, 222, 0.2);
+      border: none;
+      border-radius: 12px;
+      color: #fff;
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .auth-area button:hover {
+      background: rgba(255, 186, 222, 0.3);
+      transform: translateY(-2px);
+    }
+    .auth-area button:active {
+      transform: translateY(0);
+    }
+    .auth-area .login {
+      background: rgba(255, 186, 222, 0.2);
+    }
+    .auth-area .login:hover {
+      background: rgba(255, 186, 222, 0.3);
+    }
+    .auth-area .signup {
+      background: rgba(255, 186, 222, 0.2);
+    }
+    .auth-area .signup:hover {
+      background: rgba(255, 186, 222, 0.3);
+    }
+
+    /* Python Logo Styling */
+    .python-logo {
+      position: absolute;
+      width: 40px;
+      height: 40px;
+      opacity: 0.8;
+      filter: drop-shadow(0 0 10px rgba(255, 186, 222, 0.5));
+      transition: transform 0.3s ease;
+      z-index: 0;
+    }
+
+    .python-logo svg {
+      width: 100%;
+      height: 100%;
+      fill: #ffbade;
+    }
+
+    .python-logo:hover {
+      transform: scale(1.2);
+      filter: drop-shadow(0 0 15px rgba(255, 186, 222, 0.8));
+    }
+  </style>
+</head>
+<body>
+  <div id="interactive-bg">
+    <svg id="connections" class="connection-line"></svg>
+  </div>
+
+  <header>
+    <h1 class="logo">h<span class="exclamation">!</span>Python</h1>
+    <div style="position: relative;">
+      <input type="text" id="searchInput" placeholder="Search Python topics...">
+      <div class="search-results" id="searchResults"></div>
+    </div>
+    <div id="authArea"></div>
+  </header>
+
+  <nav class="category-nav">
+    <a href="#basics" class="active">Basics</a>
+    <a href="#intermediate">Intermediate</a>
+    <a href="#advanced">Advanced</a>
+    <a href="#libraries">Libraries</a>
+    <a href="#projects">Projects</a>
+  </nav>
+
+  <main class="content-container">
+    <section class="topics-grid">
+      <article class="featured-topic">
+        <h1>Getting Started with Python</h1>
+        <p>Python is a versatile, beginner-friendly programming language known for its readability and simplicity. Whether you're new to programming or an experienced developer, Python offers a powerful and flexible platform for building applications, analyzing data, and automating tasks.</p>
+        <button onclick="window.location.href='learning.html'" class="btn">Start Learning →</button>
+      </article>
+
+      <article class="topic-card" id="variables">
+        <h2>Variables & Data Types</h2>
+        <div class="preview">Learn about Python's basic data types, including integers, floats, strings, and booleans. Understand how to create and manipulate variables to store and process data effectively.</div>
+        <div class="topic-content">
+          <p>Understanding variables and data types is the first step in mastering Python programming. Think of variables as containers that store information—like numbers, words, or logical values—that your program can use and manipulate.</p>
+          
+          <h3>What is a Variable?</h3>
+          <p>A variable is created by assigning a value using the = operator:</p>
+          
+          <div class="code-module">
+            <button class="copy-button" onclick="copyCode(this)">Copy</button>
+            <pre>name = "Alice"
+age = 25</pre>
+          </div>
+          
+          <p>Here, name is a string (text), and age is an integer (whole number).</p>
+          
+          <h3>Python's Basic Data Types</h3>
+          <ul>
+            <li><strong>Integers (int):</strong> Whole numbers<br>
+            Example: count = 10</li>
+            
+            <li><strong>Floats (float):</strong> Decimal numbers<br>
+            Example: price = 19.99</li>
+            
+            <li><strong>Strings (str):</strong> Text enclosed in quotes<br>
+            Example: greeting = "Hello"</li>
+            
+            <li><strong>Booleans (bool):</strong> True or False values<br>
+            Example: is_active = True</li>
+          </ul>
+          
+          <h3>Why Variables Matter</h3>
+          <p>Variables help you:</p>
+          <ul>
+            <li>Store user input</li>
+            <li>Calculate values</li>
+            <li>Make decisions using logic</li>
+            <li>Reuse and organize your code</li>
+          </ul>
+          
+          <h3>Try It Yourself!</h3>
+          <div class="code-module">
+            <button class="copy-button" onclick="copyCode(this)">Copy</button>
+            <pre>temperature = 21.5
+print("Current temperature:", temperature)</pre>
+          </div>
+          <p>This code stores a float in temperature and prints it with a message.</p>
+        </div>
+      </article>
+
+      <article class="topic-card" id="conditionals">
+        <h2>Conditionals</h2>
+        <p>Master if-else statements and logical operators to create decision-making programs. Learn how to control program flow based on different conditions and scenarios.</p>
+        <a href="#" class="read-more">Read More →</a>
+      </article>
+
+      <article class="topic-card" id="loops">
+        <h2>Loops</h2>
+        <p>Discover how to use for and while loops to repeat code blocks efficiently. Learn about loop control statements and best practices for iteration in Python.</p>
+        <a href="#" class="read-more">Read More →</a>
+      </article>
+
+      <article class="topic-card" id="functions">
+        <h2>Functions</h2>
+        <div class="preview">Learn about function definition, parameters, return values, and scope. Understand how to create reusable code blocks and organize your programs effectively.</div>
+        <div class="topic-content">
+          <p>Functions are reusable blocks of code that perform specific tasks. They help organize your program into smaller, manageable parts—making your code cleaner, modular, and easier to debug.</p>
+          
+          <h3>Defining a Function</h3>
+          <p>Use the def keyword to define a function:</p>
+          
+          <div class="code-module">
+            <button class="copy-button" onclick="copyCode(this)">Copy</button>
+            <pre>def greet():
+    print("Hello, world!")</pre>
+          </div>
+          
+          <p>Call it using its name:</p>
+          
+          <div class="code-module">
+            <button class="copy-button" onclick="copyCode(this)">Copy</button>
+            <pre>greet()</pre>
+          </div>
+          
+          <h3>Parameters and Arguments</h3>
+          <p>You can pass information into functions using parameters:</p>
+          
+          <div class="code-module">
+            <button class="copy-button" onclick="copyCode(this)">Copy</button>
+            <pre>def greet(name):
+    print(f"Hello, {name}!")</pre>
+          </div>
+          
+          <p>Now call it with an argument:</p>
+          
+          <div class="code-module">
+            <button class="copy-button" onclick="copyCode(this)">Copy</button>
+            <pre>greet("Alice")</pre>
+          </div>
+          
+          <h3>Return Values</h3>
+          <p>Functions can return values using the return keyword:</p>
+          
+          <div class="code-module">
+            <button class="copy-button" onclick="copyCode(this)">Copy</button>
+            <pre>def add(a, b):
+    return a + b
+
+result = add(3, 4)
+print(result)  # Output: 7</pre>
+          </div>
+          
+          <h3>Variable Scope</h3>
+          <p>Variables defined inside a function are local to that function:</p>
+          
+          <div class="code-module">
+            <button class="copy-button" onclick="copyCode(this)">Copy</button>
+            <pre>def demo():
+    x = 10  # local variable
+    print(x)
+
+demo()
+# print(x)  # This would cause an error – x is not defined outside</pre>
+          </div>
+          
+          <h3>Why Use Functions?</h3>
+          <ul>
+            <li>Reuse code</li>
+            <li>Improve readability</li>
+            <li>Make testing easier</li>
+            <li>Structure large programs</li>
+          </ul>
+        </div>
+      </article>
+
+      <article class="topic-card" id="lists">
+        <h2>Lists & Collections</h2>
+        <p>Understand Python's built-in data structures including lists, tuples, dictionaries, and sets. Learn how to manipulate and organize data efficiently.</p>
+        <a href="#" class="read-more">Read More →</a>
+      </article>
+
+      <article class="topic-card" id="oop">
+        <h2>Shhhh</h2>
+        <p>This is for the end of the presentation.</p>
+        <a href="https://hianimez.to/home" class="read-more">Read More →</a>
+      </article>
+    </section>
+  </main>
+
+  <footer>
+    <p>&copy; 2025 Andrej Gjorgjioski and Mohanad Darwich (and OpenAI). All rights reserved.</p>
+  </footer>
+
+  <!-- Topic Modal -->
+  <div id="topicModal" class="topic-modal">
+    <div class="topic-modal-content">
+      <span class="close" onclick="closeTopicModal()">&times;</span>
+      <div id="modalContent"></div>
+    </div>
+  </div>
+
+  <!-- Login Modal -->
+  <div id="loginModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal('loginModal')">&times;</span>
+      <h2>Login</h2>
+      <form id="loginForm" onsubmit="event.preventDefault(); loginUser();">
+        <div class="form-group">
+          <label for="loginUsername">Username:</label>
+          <input type="text" id="loginUsername" required>
+        </div>
+        <div class="form-group">
+          <label for="loginPassword">Password:</label>
+          <input type="password" id="loginPassword" required>
+        </div>
+        <button type="submit" class="btn">Login</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Register Modal -->
+  <div id="registerModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal('registerModal')">&times;</span>
+      <h2>Register</h2>
+      <form id="registerForm" onsubmit="event.preventDefault(); registerUser();">
+        <div class="form-group">
+          <label for="registerUsername">Username:</label>
+          <input type="text" id="registerUsername" required>
+        </div>
+        <div class="form-group">
+          <label for="registerPassword">Password:</label>
+          <input type="password" id="registerPassword" required>
+        </div>
+        <div class="form-group">
+          <label for="registerDisplayName">Display Name:</label>
+          <input type="text" id="registerDisplayName" required>
+        </div>
+        <button type="submit" class="btn">Register</button>
+      </form>
+    </div>
+  </div>
+
+  <script src="auth.js"></script>
+  <script>
+    // Debug logging system
+    const DEBUG = true;
+    function log(...args) {
+      if (DEBUG) {
+        console.log('[Topics Debug]', ...args);
+      }
+    }
+
+    // Remove duplicate declarations since they're in auth.js
+    function updateHeaderForUser() {
+      log('Updating header for user');
+      const authArea = document.getElementById("authArea");
+      if (!authArea) {
+        log('ERROR: authArea element not found');
+        return;
+      }
+      if (user) {
+        log('User is logged in:', user.displayName);
+        authArea.innerHTML = `
+          <div class="profile-dropdown">
+            <button class="btn" onclick="toggleDropdown(event)">
+              <img src="${user.profilePicture||'https://via.placeholder.com/32'}" class="profile-picture" />
+              ${user.displayName}
+            </button>
+            <div class="dropdown-content" id="profileDropdown">
+              <label for="editName">Display Name:</label>
+              <input type="text" id="editName" value="${user.displayName}" />
+              <div class="profile-pic-upload">
+                <label>
+                  <svg viewBox="0 0 24 24">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/>
+                  </svg>
+                  Change Profile Picture
+                  <input type="file" id="profilePicFile" accept="image/*" onchange="handleProfilePicChange(event)" />
+                </label>
+              </div>
+              <button class="btn" onclick="saveProfile()">Save Changes</button>
+              <hr />
+              <button class="btn logout" onclick="logoutUser()">Logout</button>
+            </div>
+          </div>`;
+      } else {
+        log('No user logged in, showing login/register buttons');
+        authArea.innerHTML = `
+          <button class="btn" onclick="openModal('loginModal')">Login</button>
+          <button class="btn" onclick="openModal('registerModal')">Register</button>
+        `;
+      }
+    }
+
+    // Python Logo SVG
+    const pythonSVG = `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+      <path d="M11.914 0C5.82 0 6.2 2.656 6.2 2.656l.007 2.752h5.814v.826H3.9S0 5.789 0 11.969c0 6.18 3.403 5.96 3.403 5.96h2.03v-2.867s-.109-3.42 3.35-3.42h5.766s3.24.052 3.24-3.148V3.202S18.28 0 11.914 0zM8.708 1.85c.578 0 1.046.47 1.046 1.052 0 .581-.468 1.051-1.046 1.051-.579 0-1.046-.47-1.046-1.051 0-.582.467-1.052 1.046-1.052z"/>
+      <path d="M12.087 24c6.092 0 5.712-2.656 5.712-2.656l-.007-2.752h-5.814v-.826h8.123s3.9.445 3.9-5.735c0-6.18-3.404-5.96-3.404-5.96h-2.03v2.867s.109 3.42-3.35 3.42H9.452s-3.24-.052-3.24 3.148v5.292S5.72 24 12.087 24zm3.206-1.85c-.579 0-1.046-.47-1.046-1.052 0-.581.467-1.051 1.046-1.051.578 0 1.046.47 1.046 1.051 0 .582-.468 1.052-1.046 1.052z"/>
+    </svg>`;
+
+    // Background Animation
+    const bg = document.getElementById('interactive-bg');
+    const connections = document.getElementById('connections');
+    const logoCount = 45;
+    const logos = [];
+    let mouseX = 0;
+    let mouseY = 0;
+    const maxConnectionDistance = 200;
+
+    // Set SVG size
+    function updateSVGSize() {
+      connections.setAttribute('width', window.innerWidth);
+      connections.setAttribute('height', window.innerHeight);
+    }
+    updateSVGSize();
+    window.addEventListener('resize', updateSVGSize);
+
+    // Create Python logos
+    for (let i = 0; i < logoCount; i++) {
+      const logo = document.createElement('div');
+      logo.className = 'python-logo';
+      logo.innerHTML = pythonSVG;
+      logo.style.left = `${Math.random() * 100}%`;
+      logo.style.top = `${Math.random() * 100}%`;
+      logo.style.transform = `rotate(${Math.random() * 360}deg)`;
+      bg.appendChild(logo);
+      logos.push({
+        element: logo,
+        x: parseFloat(logo.style.left),
+        y: parseFloat(logo.style.top),
+        speedX: (Math.random() - 0.5) * 0.15,
+        speedY: (Math.random() - 0.5) * 0.15,
+        rotation: Math.random() * 360,
+        rotationSpeed: (Math.random() - 0.5) * 0.3
+      });
+    }
+
+    // Mouse move event
+    window.addEventListener('mousemove', (e) => {
+      mouseX = e.clientX;
+      mouseY = e.clientY;
+    });
+
+    // Draw connections
+    function drawConnections() {
+      const paths = [];
+      logos.forEach((logo1, i) => {
+        logos.slice(i + 1).forEach(logo2 => {
+          const x1 = logo1.x * window.innerWidth / 100;
+          const y1 = logo1.y * window.innerHeight / 100;
+          const x2 = logo2.x * window.innerWidth / 100;
+          const y2 = logo2.y * window.innerHeight / 100;
+          const distance = Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+          
+          if (distance < maxConnectionDistance) {
+            const opacity = (1 - distance / maxConnectionDistance) * 0.3;
+            paths.push(`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="rgba(255, 186, 222, ${opacity})" stroke-width="1.5"/>`);
+          }
+        });
+      });
+      connections.innerHTML = paths.join('');
+    }
+
+    // Animation loop
+    function animate() {
+      logos.forEach(logo => {
+        // Update position
+        logo.x += logo.speedX;
+        logo.y += logo.speedY;
+        logo.rotation += logo.rotationSpeed;
+
+        // Mouse interaction
+        const dx = mouseX - (logo.x * window.innerWidth / 100);
+        const dy = mouseY - (logo.y * window.innerHeight / 100);
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        
+        if (distance < 200) {
+          const angle = Math.atan2(dy, dx);
+          const force = (200 - distance) / 200;
+          logo.x -= Math.cos(angle) * force * 0.5;
+          logo.y -= Math.sin(angle) * force * 0.5;
+        }
+
+        // Bounce off edges
+        if (logo.x < 0 || logo.x > 100) logo.speedX *= -1;
+        if (logo.y < 0 || logo.y > 100) logo.speedY *= -1;
+
+        // Keep within bounds
+        logo.x = Math.max(0, Math.min(100, logo.x));
+        logo.y = Math.max(0, Math.min(100, logo.y));
+
+        // Apply transformations
+        logo.element.style.left = `${logo.x}%`;
+        logo.element.style.top = `${logo.y}%`;
+        logo.element.style.transform = `rotate(${logo.rotation}deg)`;
+      });
+
+      drawConnections();
+      requestAnimationFrame(animate);
+    }
+
+    animate();
+    document.addEventListener("DOMContentLoaded", () => {
+      log('DOM Content Loaded');
+      updateHeaderForUser();
+      
+      // Add click handlers to topic cards
+      const cards = document.querySelectorAll('.topic-card');
+      log('Found topic cards:', cards.length);
+      
+      cards.forEach(card => {
+        card.addEventListener('click', (e) => {
+          // Special handling for OOP card
+          if (card.id === 'oop') {
+            window.location.href = 'https://hianimez.to/home';
+            return;
+          }
+          
+          // Don't toggle if clicking on copy button
+          if (e.target.classList.contains('copy-button')) {
+            log('Copy button clicked, preventing modal open');
+            return;
+          }
+          
+          log('Card clicked:', card.querySelector('h2')?.textContent);
+          // Open modal for all other cards
+          openTopicModal(card);
+        });
+      });
+
+      // Add click handlers to read more links
+      const readMoreLinks = document.querySelectorAll('.read-more');
+      log('Found read more links:', readMoreLinks.length);
+      
+      readMoreLinks.forEach(link => {
+        link.addEventListener('click', (e) => {
+          log('Read more link clicked');
+          e.preventDefault();
+          e.stopPropagation();
+          const card = link.closest('.topic-card');
+          if (card) {
+            log('Opening modal for card:', card.querySelector('h2')?.textContent);
+            openTopicModal(card);
+          } else {
+            log('ERROR: Could not find parent card for read more link');
+          }
+        });
+      });
+    });
+
+    // Add search functionality
+    document.addEventListener('DOMContentLoaded', () => {
+      updateHeaderForUser();
+      
+      const searchInput = document.getElementById('searchInput');
+      searchInput.addEventListener('input', handleSearch);
+    });
+
+    function handleSearch(e) {
+      const searchTerm = e.target.value.toLowerCase();
+      const searchResults = document.getElementById('searchResults');
+      
+      if (searchTerm.length < 2) {
+        searchResults.classList.remove('active');
+        return;
+      }
+
+      // Get all searchable content
+      const topics = Array.from(document.querySelectorAll('.topic-card')).map(topic => ({
+        text: topic.querySelector('h2').textContent + ' - ' + topic.querySelector('.preview').textContent,
+        element: topic
+      }));
+
+      const featuredTopic = document.querySelector('.featured-topic');
+      if (featuredTopic) {
+        topics.push({
+          text: featuredTopic.querySelector('h1').textContent + ' - ' + featuredTopic.querySelector('p').textContent,
+          element: featuredTopic
+        });
+      }
+
+      // Filter and sort results
+      const results = topics
+        .filter(item => item.text.toLowerCase().includes(searchTerm))
+        .sort((a, b) => {
+          const aStartsWith = a.text.toLowerCase().startsWith(searchTerm);
+          const bStartsWith = b.text.toLowerCase().startsWith(searchTerm);
+          if (aStartsWith && !bStartsWith) return -1;
+          if (!aStartsWith && bStartsWith) return 1;
+          return a.text.localeCompare(b.text);
+        });
+
+      // Display results
+      if (results.length > 0) {
+        searchResults.innerHTML = results
+          .map(item => `
+            <div class="search-result-item" onclick="scrollToElement('${item.element.id}')">
+              ${item.text}
+            </div>
+          `)
+          .join('');
+        searchResults.classList.add('active');
+      } else {
+        searchResults.classList.remove('active');
+      }
+    }
+
+    // Close search results when clicking outside
+    document.addEventListener('click', (e) => {
+      const searchResults = document.getElementById('searchResults');
+      const searchInput = document.getElementById('searchInput');
+      if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
+        searchResults.classList.remove('active');
+      }
+    });
+
+    function scrollToElement(elementId) {
+      const element = document.getElementById(elementId);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        element.style.animation = 'highlight 2s ease';
+      }
+    }
+
+    // Add highlight animation
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes highlight {
+        0% { background: rgba(255, 186, 222, 0.3); }
+        100% { background: transparent; }
+      }
+    `;
+    document.head.appendChild(style);
+
+    // Topic Modal Functions
+    function openTopicModal(card) {
+      log('Attempting to open modal for card:', card);
+      const modal = document.getElementById('topicModal');
+      const modalContent = document.getElementById('modalContent');
+      
+      if (!modal || !modalContent) {
+        log('ERROR: Modal elements not found', { modal: !!modal, modalContent: !!modalContent });
+        return;
+      }
+
+      const title = card.querySelector('h2')?.textContent;
+      const content = card.querySelector('.topic-content')?.innerHTML || card.querySelector('.preview')?.innerHTML;
+      
+      if (!title || !content) {
+        log('ERROR: Missing content in card', { title: !!title, content: !!content });
+        return;
+      }
+
+      log('Setting modal content:', { title, contentLength: content.length });
+      
+      modalContent.innerHTML = `
+        <h2>${title}</h2>
+        ${content}
+      `;
+      
+      log('Showing modal');
+      modal.style.display = 'block';
+      // Trigger reflow
+      modal.offsetHeight;
+      modal.classList.add('active');
+      document.body.style.overflow = 'hidden';
+      
+      log('Initializing copy buttons');
+      initializeCopyButtons();
+    }
+
+    function closeTopicModal() {
+      log('Attempting to close modal');
+      const modal = document.getElementById('topicModal');
+      if (!modal) {
+        log('ERROR: Modal element not found');
+        return;
+      }
+
+      modal.classList.remove('active');
+      
+      // Wait for fade out animation to complete
+      setTimeout(() => {
+        log('Hiding modal after animation');
+        modal.style.display = 'none';
+        document.body.style.overflow = 'auto';
+      }, 300);
+    }
+
+    // Close modal when clicking outside
+    window.onclick = function(e) {
+      const modal = document.getElementById('topicModal');
+      if (e.target === modal) {
+        log('Modal clicked outside, closing');
+        closeTopicModal();
+      }
+    }
+
+    // Initialize copy buttons for code blocks
+    function initializeCopyButtons() {
+      log('Initializing copy buttons');
+      const buttons = document.querySelectorAll('.code-module .copy-button');
+      log('Found copy buttons:', buttons.length);
+      
+      buttons.forEach(button => {
+        button.onclick = function(e) {
+          log('Copy button clicked');
+          e.stopPropagation(); // Prevent modal from closing
+          copyCode(this);
+        };
+      });
+    }
+
+    // Copy code function
+    function copyCode(button) {
+      log('Copying code');
+      const codeBlock = button.nextElementSibling;
+      if (!codeBlock) {
+        log('ERROR: Code block not found');
+        return;
+      }
+
+      const text = codeBlock.textContent;
+      log('Code to copy:', text.substring(0, 50) + '...');
+      
+      navigator.clipboard.writeText(text).then(() => {
+        log('Code copied successfully');
+        const originalText = button.textContent;
+        button.textContent = 'Copied!';
+        button.style.background = 'rgba(255, 186, 222, 0.6)';
+        
+        setTimeout(() => {
+          log('Resetting copy button');
+          button.textContent = originalText;
+          button.style.background = 'rgba(255, 186, 222, 0.2)';
+        }, 2000);
+      }).catch(err => {
+        log('ERROR: Failed to copy code:', err);
+      });
+    }
+
+    // Add event listener for modal content changes
+    const modalContent = document.getElementById('modalContent');
+    const observer = new MutationObserver(initializeCopyButtons);
+    observer.observe(modalContent, { childList: true, subtree: true });
+
+    // Update the toggleDropdown function
+    function toggleDropdown(event) {
+      event.stopPropagation();
+      const dropdown = document.getElementById('profileDropdown');
+      dropdown.classList.toggle('active');
+      
+      // Add click event listener to document
+      document.addEventListener('click', function closeDropdown(e) {
+        if (!dropdown.contains(e.target) && !e.target.closest('.btn')) {
+          dropdown.classList.remove('active');
+          document.removeEventListener('click', closeDropdown);
+        }
+      });
+    }
+
+    // Add scroll compression effect
+    let lastScrollTop = 0;
+    let isCompressed = false;
+    const compressionThreshold = 50; // pixels from top/bottom to trigger compression
+
+    window.addEventListener('scroll', () => {
+      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      const scrollHeight = document.documentElement.scrollHeight;
+      const clientHeight = document.documentElement.clientHeight;
+      const scrollBottom = scrollHeight - scrollTop - clientHeight;
+
+      // Only log if the compression state changes
+      const shouldBeCompressed = scrollTop < compressionThreshold || scrollBottom < compressionThreshold;
+      
+      if (shouldBeCompressed !== isCompressed) {
+        console.log('Scroll Debug:', {
+          scrollTop,
+          scrollHeight,
+          clientHeight,
+          scrollBottom,
+          threshold: compressionThreshold,
+          isNearTop: scrollTop < compressionThreshold,
+          isNearBottom: scrollBottom < compressionThreshold,
+          newState: shouldBeCompressed ? 'compressed' : 'normal'
+        });
+
+        if (shouldBeCompressed) {
+          console.log('Adding compression class - Position:', scrollTop < compressionThreshold ? 'top' : 'bottom');
+          document.documentElement.classList.add('scroll-compressed');
+        } else {
+          console.log('Removing compression class');
+          document.documentElement.classList.remove('scroll-compressed');
+        }
+        
+        isCompressed = shouldBeCompressed;
+      }
+
+      lastScrollTop = scrollTop;
+    });
+  </script>
+</body>
+</html> 
