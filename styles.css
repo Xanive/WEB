@@ -574,16 +574,20 @@ header {
     flex-direction: column;
     gap: var(--spacing-md);
     padding: var(--spacing-sm);
+    text-align: left;
   }
 
   .logo {
     font-size: 2rem;
+    text-align: left;
+    width: 100%;
   }
 
   #searchInput {
     width: 100%;
     max-width: 100%;
     padding: 12px 20px 12px 45px;
+    font-size: 0.9rem;
   }
 
   #searchInput:focus {
@@ -593,12 +597,15 @@ header {
   .search-results {
     width: 90%;
     max-height: 300px;
+    left: 0;
+    transform: none;
   }
 
   .learning-content,
   .quiz {
     margin: var(--spacing-md);
     padding: var(--spacing-md);
+    text-align: left;
   }
 
   .btn {
@@ -621,16 +628,19 @@ header {
 
   .topic-card {
     padding: 20px;
+    text-align: left;
   }
 
   .featured-topic {
     padding: 20px;
+    text-align: left;
   }
 
   .category-nav {
     flex-wrap: wrap;
     gap: 10px;
     padding: 10px;
+    justify-content: flex-start;
   }
 
   .category-nav a {
@@ -642,11 +652,41 @@ header {
     width: 95%;
     margin: 10% auto;
     padding: 20px;
+    text-align: left;
   }
 
   .dropdown-content {
     width: 100%;
     min-width: unset;
+    text-align: left;
+  }
+
+  .form-group {
+    text-align: left;
+  }
+
+  .form-group input {
+    text-align: left;
+  }
+
+  .task {
+    text-align: left;
+  }
+
+  .task textarea {
+    text-align: left;
+  }
+
+  .quiz-question {
+    text-align: left;
+  }
+
+  .quiz-options {
+    text-align: left;
+  }
+
+  .quiz-result {
+    text-align: left;
   }
 }
 
@@ -662,6 +702,11 @@ header {
 
   .logo {
     font-size: 1.8rem;
+  }
+
+  #searchInput {
+    font-size: 0.85rem;
+    padding: 10px 20px 10px 40px;
   }
 
   .learning-content,
