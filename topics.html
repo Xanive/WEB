@@ -1403,20 +1403,7 @@ demo()
     const observer = new MutationObserver(initializeCopyButtons);
     observer.observe(modalContent, { childList: true, subtree: true });
 
-    // Update the toggleDropdown function
-    function toggleDropdown(event) {
-      event.stopPropagation();
-      const dropdown = document.getElementById('profileDropdown');
-      dropdown.classList.toggle('active');
-      
-      // Add click event listener to document
-      document.addEventListener('click', function closeDropdown(e) {
-        if (!dropdown.contains(e.target) && !e.target.closest('.btn')) {
-          dropdown.classList.remove('active');
-          document.removeEventListener('click', closeDropdown);
-        }
-      });
-    }
+    // Note: toggleDropdown function is handled by auth.js
 
     // Add scroll compression effect
     let lastScrollTop = 0;
