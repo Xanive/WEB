@@ -207,22 +207,43 @@ function createInteractiveBackground() {
     const bg = document.getElementById('interactive-bg');
     if (!bg) return;
 
-    const numLogos = 45;
-    const connections = [];
+    // Check for reduced motion preference and device performance
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const isLowEndDevice = !window.matchMedia('(min-resolution: 2dppx)').matches || 
+                          navigator.hardwareConcurrency <= 4;
+    
+    // Adjust settings based on device capabilities
+    const numLogos = prefersReducedMotion ? 5 : (isLowEndDevice ? 15 : 45);
+    const connectionDistance = isLowEndDevice ? 100 : 150;
+    const connectionUpdateInterval = isLowEndDevice ? 1000 : (prefersReducedMotion ? 1000 : 500);
+    const frameSkip = isLowEndDevice ? 2 : 1; // Skip every other frame on low-end devices
+    let frameCount = 0;
+
     let logos = [];
     let mouseX = 0;
     let mouseY = 0;
+    let lastMouseMove = 0;
+    let animationFrameId = null;
+    let lastFrameTime = 0;
+    const targetFPS = 60;
+    const frameInterval = 1000 / targetFPS;
 
-    // Mouse move event
+    // Throttled mouse move event using requestAnimationFrame
     window.addEventListener('mousemove', (e) => {
-        mouseX = e.clientX;
-        mouseY = e.clientY;
+        const now = performance.now();
+        if (now - lastMouseMove >= 32) { // Reduced to 30fps for mouse tracking
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+            lastMouseMove = now;
+        }
     });
 
-    // Create Python logos
+    // Create Python logos with object pooling
+    const logoPool = [];
     for (let i = 0; i < numLogos; i++) {
         const logo = document.createElement('div');
         logo.className = 'python-logo';
+        logo.style.willChange = 'transform';
         logo.innerHTML = '<svg viewBox="0 0 128 128"><path d="M63.391 1.988c-4.222.02-8.252.379-11.8 1.007-10.45 1.846-12.346 5.71-12.346 12.837v9.411h24.693v3.137h-33.961c-7.176 0-13.46 4.313-15.426 12.521-2.268 9.405-2.368 15.275 0 25.096 1.755 7.311 5.947 12.519 13.124 12.519h8.491v-11.282c0-8.151 7.051-15.34 15.426-15.34h24.665c6.866 0 12.346-5.654 12.346-12.548v-23.513c0-6.693-5.646-11.72-12.346-12.837-4.244-.706-8.645-1.027-12.866-1.008zm-13.354 7.569c2.55 0 4.634 2.117 4.634 4.721 0 2.593-2.083 4.69-4.634 4.69-2.56 0-4.633-2.097-4.633-4.69-.001-2.604 2.073-4.721 4.633-4.721z"/><path d="M91.682 28.38v10.966c0 8.5-7.208 15.655-15.426 15.655h-24.665c-6.756 0-12.346 5.783-12.346 12.549v23.515c0 6.691 5.818 10.628 12.346 12.547 7.816 2.297 15.312 2.713 24.665 0 6.216-1.801 12.346-5.423 12.346-12.547v-9.412h-24.664v-3.138h37.012c7.176 0 9.852-5.005 12.348-12.519 2.578-7.735 2.467-15.174 0-25.096-1.774-7.145-5.161-12.521-12.348-12.521h-9.268zm-13.873 59.547c2.561 0 4.634 2.097 4.634 4.692 0 2.602-2.074 4.719-4.634 4.719-2.55 0-4.633-2.117-4.633-4.719 0-2.595 2.083-4.692 4.633-4.692z"/></svg>';
         
         // Random position
@@ -231,90 +252,104 @@ function createInteractiveBackground() {
         logo.style.left = x + 'px';
         logo.style.top = y + 'px';
         
-        // Random movement
+        // Random movement (slower for reduced motion and low-end devices)
         const speed = {
-            x: (Math.random() - 0.5) * 2,
-            y: (Math.random() - 0.5) * 2
+            x: (Math.random() - 0.5) * (prefersReducedMotion ? 0.3 : (isLowEndDevice ? 0.8 : 2)),
+            y: (Math.random() - 0.5) * (prefersReducedMotion ? 0.3 : (isLowEndDevice ? 0.8 : 2))
         };
         
-        logos.push({ element: logo, x, y, speed });
+        logoPool.push({ element: logo, x, y, speed });
         bg.appendChild(logo);
     }
 
-    // Create SVG for connections
-    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-    svg.classList.add('connection-line');
-    svg.style.width = '100%';
-    svg.style.height = '100%';
-    bg.insertBefore(svg, bg.firstChild);
+    // Create canvas for connections
+    const canvas = document.createElement('canvas');
+    canvas.style.position = 'absolute';
+    canvas.style.top = '0';
+    canvas.style.left = '0';
+    canvas.style.width = '100%';
+    canvas.style.height = '100%';
+    canvas.style.pointerEvents = 'none';
+    bg.insertBefore(canvas, bg.firstChild);
 
-    function updateConnections() {
-        // Clear existing connections
-        while (svg.firstChild) {
-            svg.removeChild(svg.firstChild);
-        }
+    const ctx = canvas.getContext('2d', { alpha: false }); // Disable alpha for better performance
+    let lastConnectionUpdate = 0;
 
-        // Create new connections
-        for (let i = 0; i < logos.length; i++) {
-            for (let j = i + 1; j < logos.length; j++) {
-                const distance = Math.hypot(
-                    logos[i].x - logos[j].x,
-                    logos[i].y - logos[j].y
-                );
-
-                if (distance < 200) {
-                    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-                    line.setAttribute('x1', logos[i].x + 20);
-                    line.setAttribute('y1', logos[i].y + 20);
-                    line.setAttribute('x2', logos[j].x + 20);
-                    line.setAttribute('y2', logos[j].y + 20);
-                    line.setAttribute('stroke', 'rgba(255, 186, 222, ' + (1 - distance / 200) + ')');
-                    line.setAttribute('stroke-width', '1.5');
-                    svg.appendChild(line);
-                }
-            }
-        }
+    function resizeCanvas() {
+        const dpr = window.devicePixelRatio || 1;
+        canvas.width = window.innerWidth * dpr;
+        canvas.height = window.innerHeight * dpr;
+        canvas.style.width = window.innerWidth + 'px';
+        canvas.style.height = window.innerHeight + 'px';
+        ctx.scale(dpr, dpr);
     }
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
 
-    function animate() {
-        logos = logos.map(logo => {
-            // Update position
+    function animate(timestamp) {
+        animationFrameId = requestAnimationFrame(animate);
+
+        // Frame skipping for low-end devices
+        frameCount++;
+        if (frameCount % frameSkip !== 0) return;
+
+        // Limit FPS
+        const elapsed = timestamp - lastFrameTime;
+        if (elapsed < frameInterval) return;
+        lastFrameTime = timestamp;
+
+        // Update logo positions
+        logoPool.forEach(logo => {
             logo.x += logo.speed.x;
             logo.y += logo.speed.y;
-
-            // Mouse interaction
-            const dx = mouseX - logo.x;
-            const dy = mouseY - logo.y;
-            const distance = Math.hypot(dx, dy);
             
-            if (distance < 200) {
-                const force = (200 - distance) / 200;
-                logo.x -= dx * force * 0.05;
-                logo.y -= dy * force * 0.05;
-            }
-
             // Bounce off walls
-            if (logo.x <= 0 || logo.x >= window.innerWidth - 40) {
-                logo.speed.x *= -1;
-                logo.x = Math.max(0, Math.min(logo.x, window.innerWidth - 40));
-            }
-            if (logo.y <= 0 || logo.y >= window.innerHeight - 40) {
-                logo.speed.y *= -1;
-                logo.y = Math.max(0, Math.min(logo.y, window.innerHeight - 40));
-            }
-
-            // Update DOM element
-            logo.element.style.left = logo.x + 'px';
-            logo.element.style.top = logo.y + 'px';
-
-            return logo;
+            if (logo.x <= 0 || logo.x >= window.innerWidth - 40) logo.speed.x *= -1;
+            if (logo.y <= 0 || logo.y >= window.innerHeight - 40) logo.speed.y *= -1;
+            
+            // Use transform3d for hardware acceleration
+            logo.element.style.transform = `translate3d(${logo.x}px, ${logo.y}px, 0)`;
         });
 
-        updateConnections();
-        requestAnimationFrame(animate);
+        // Update connections less frequently
+        const now = performance.now();
+        if (now - lastConnectionUpdate >= connectionUpdateInterval) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+            ctx.lineWidth = 1;
+
+            // Draw connections between nearby logos
+            for (let i = 0; i < logoPool.length; i++) {
+                for (let j = i + 1; j < logoPool.length; j++) {
+                    const dx = logoPool[i].x - logoPool[j].x;
+                    const dy = logoPool[i].y - logoPool[j].y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    
+                    if (distance < connectionDistance) {
+                        ctx.beginPath();
+                        ctx.moveTo(logoPool[i].x + 20, logoPool[i].y + 20);
+                        ctx.lineTo(logoPool[j].x + 20, logoPool[j].y + 20);
+                        ctx.stroke();
+                    }
+                }
+            }
+            lastConnectionUpdate = now;
+        }
     }
 
-    animate();
+    // Start animation
+    animate(0);
+
+    // Cleanup function
+    return () => {
+        if (animationFrameId) {
+            cancelAnimationFrame(animationFrameId);
+        }
+        window.removeEventListener('resize', resizeCanvas);
+        // Clean up DOM elements
+        logoPool.forEach(logo => logo.element.remove());
+        canvas.remove();
+    };
 }
 
 // Initialize interactive background when DOM is loaded
