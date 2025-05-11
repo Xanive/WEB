@@ -28,9 +28,9 @@
   --radius-full: 50px;
   
   /* Shadows */
-  --shadow-sm: 0 4px 10px rgba(0,0,0,0.5);
-  --shadow-md: 0 8px 20px rgba(0,0,0,0.5);
-  --shadow-lg: 0 10px 40px rgba(0,0,0,0.6);
+  --shadow-sm: 0 4px 10px rgba(0,0,0,0.3);
+  --shadow-md: 0 8px 20px rgba(0,0,0,0.35);
+  --shadow-lg: 0 10px 40px rgba(0,0,0,0.4);
 }
 
 /* Base Styles */
@@ -92,7 +92,7 @@ p { font-size: 1.1rem; color: var(--text-secondary); }
   width: 40px;
   height: 40px;
   opacity: 0.8;
-  filter: drop-shadow(0 0 10px rgba(255, 186, 222, 0.5));
+  filter: drop-shadow(0 0 10px rgba(255, 186, 222, 0.35));
   transition: transform 0.3s ease;
   z-index: 0;
   will-change: transform;
@@ -108,7 +108,7 @@ p { font-size: 1.1rem; color: var(--text-secondary); }
 
 .python-logo:hover {
   transform: scale(1.2);
-  filter: drop-shadow(0 0 15px rgba(255, 186, 222, 0.8));
+  filter: drop-shadow(0 0 15px rgba(255, 186, 222, 0.4));
 }
 
 /* Layout */
@@ -222,7 +222,7 @@ header {
   cursor: pointer;
   font-weight: 700;
   font-size: 1rem;
-  box-shadow: 0 0 10px rgba(255,186,222,0.7), 0 0 30px rgba(255,198,228,0.5);
+  box-shadow: 0 0 10px rgba(255,186,222,0.3), 0 0 30px rgba(255,198,228,0.35);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   text-decoration: none;
   min-width: 120px;
@@ -230,7 +230,7 @@ header {
 
 .btn:hover {
   transform: translateY(-5px) scale(1.05);
-  box-shadow: 0 0 15px rgba(255,186,222,1), 0 0 45px rgba(255,198,228,0.8);
+  box-shadow: 0 0 15px rgba(255,186,222,0.4), 0 0 45px rgba(255,198,228,0.35);
 }
 
 /* Auth Area */
@@ -474,7 +474,7 @@ header {
 
 .topic-card:hover {
   transform: translateY(-10px);
-  box-shadow: 0 15px 50px rgba(0,0,0,0.8);
+  box-shadow: 0 15px 50px rgba(0,0,0,0.35);
 }
 
 .topic-card h2 {
@@ -830,4 +830,17 @@ header {
 
 .scroll-compressed.scroll-bottom::-webkit-scrollbar-thumb {
   transform-origin: bottom;
+}
+
+/* Quiz Section */
+.quiz {
+  box-shadow: var(--shadow-lg);
+}
+
+.quiz-question {
+  box-shadow: 0 5px 20px rgba(0,0,0,0.35);
+}
+
+.quiz-result {
+  box-shadow: 0 5px 20px rgba(0,0,0,0.35);
 }
