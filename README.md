@@ -36,4 +36,4 @@
 
 ## Credits
 
-Created by me, a bomber (and OpenAI).
+Created by Andrej and Mohanad (and OpenAI).
