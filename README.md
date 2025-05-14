@@ -28,7 +28,7 @@
 
 ## Getting Started
 
-1. Open `https://xanive.github.io/WEB/` in your browser 
+1. Open `https://xanive.github.io/hiPython/index.html` in your browser 
 2. Register a new user.
 3. Explore topics, complete coding tasks, and test yourself in the quiz!
 
